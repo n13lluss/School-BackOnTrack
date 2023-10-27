@@ -13,5 +13,6 @@ namespace BackOnTrack.Core.Models
         public string Description { get; set; }
         public DateTime PlannedDate { get; set; }
         public string UserId { get; set; }
+        public int Status { get; set; } = 0;
     }
 }

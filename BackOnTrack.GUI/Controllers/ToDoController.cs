@@ -1,4 +1,5 @@
-﻿using BackOnTrack.Core.Models;
+﻿using BackOnTrack.Core.Interfaces;
+using BackOnTrack.Core.Models;
 using BackOnTrack.GUI.Models;
 using BackOnTrackGUI.Models;
 using Microsoft.AspNetCore.Http;
@@ -8,10 +9,38 @@ namespace BackOnTrackGUI.Controllers
 {
     public class ToDoController : Controller
     {
+
+        private readonly IToDOService _ToDoService;
+
+        public ToDoController(IToDOService toDoService)
+        {
+            _ToDoService = toDoService;
+        }
         // GET: ToDoController
         public ActionResult Index()
         {
             List<ToDoViewModel> toDos = new List<ToDoViewModel>();
+            //List<ToDo> ToDoModels = _ToDoService.GetAllToDos();
+            //foreach (ToDo toDo in ToDoModels)
+            //{
+            //    ToDoViewModel toDoViewModel = new()
+            //    {
+            //        Title =  toDo.Name,
+            //        Description = toDo.Description,
+            //        Planned = toDo.PlannedDate
+            //    };
+            //    toDos.Add(toDoViewModel);
+            //}
+            ToDoViewModel toDo = new()
+            {
+                Title = "This is a test run",
+                Description = "this is a test file where im testing if the ui works correctly",
+                Planned = DateTime.Now,
+                Status = 1
+            };
+
+            toDos.Add(toDo);
+
             return View(toDos);
         }
 

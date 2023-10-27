@@ -19,6 +19,10 @@ namespace BackOnTrack.Core.Services
 
         public SleepResult CreateResult(SleepResult result)
         {
+            if(result.HoursSlept > 24)
+            {
+                return null;
+            }
             bool IsCreated = _sleepRepository.CreateResult(result);
 
             if(IsCreated)
@@ -37,6 +41,10 @@ namespace BackOnTrack.Core.Services
 
         public SleepResult EditResult(SleepResult result)
         {
+            if (result.HoursSlept > 24)
+            {
+                return null;
+            }
             bool updated = _sleepRepository.UpdateResult(result);
             if(updated)
             {

@@ -5,5 +5,6 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime Planned { get; set; }
+        public int Status { get; set; }
     }
 }

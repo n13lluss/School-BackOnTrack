@@ -7,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ISleepService, SleepService>();
 builder.Services.AddScoped<ISleepRepository, SleepRepository>();
 
+builder.Services.AddScoped<IToDOService, ToDoService>();
+builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
