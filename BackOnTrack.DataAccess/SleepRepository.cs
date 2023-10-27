@@ -55,35 +55,34 @@ namespace BackOnTrack.DataAccess
 
         public bool DeleteResult(SleepResult Delete)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using SqlConnection sqlConnection = new(_connectionString);
+
+            string query = "DELETE FROM [Sleepresults] WHERE [Id] = @SleepId AND [User_Id] = @UserId AND [HoursSlept] = @HoursSlept AND [Date] = @Date";
+
+            SqlCommand command = new SqlCommand(query, sqlConnection);
+            command.Parameters.AddWithValue("@SleepId", Delete.Id);
+            command.Parameters.AddWithValue("@UserId", Delete.UserID);
+            command.Parameters.AddWithValue("@HoursSlept", Delete.HoursSlept);
+            command.Parameters.AddWithValue("@Date", Delete.Date);
+
+            try
             {
-                string query = "DELETE FROM [Sleepresults] WHERE [Id] = @SleepId AND [User_Id] = @UserId AND [HoursSlept] = @HoursSlept AND [Date] = @Date";
+                sqlConnection.Open();
+                int rowsAffected = command.ExecuteNonQuery();
 
-                SqlCommand command = new SqlCommand(query, sqlConnection);
-                command.Parameters.AddWithValue("@SleepId", Delete.Id);
-                command.Parameters.AddWithValue("@UserId", Delete.UserID);
-                command.Parameters.AddWithValue("@HoursSlept", Delete.HoursSlept);
-                command.Parameters.AddWithValue("@Date", Delete.Date);
-
-                try
+                if (rowsAffected > 0)
                 {
-                    sqlConnection.Open();
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return true;
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine(ex.Message);
                     return false;
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
             }
         }
 
@@ -105,7 +104,7 @@ namespace BackOnTrack.DataAccess
                         {
                             SleepResult result = new()
                             {
-                                Id = Convert.ToInt32(reader["Id"]),
+                                Id = Convert.ToInt32(reader["Id"]), // int.Parse() of int.TryParse()
                                 HoursSlept = Convert.ToInt32(reader["HoursSlept"]),
                                 Date = Convert.ToDateTime(reader["Date"]),
                                 UserID = Convert.ToString(reader["user_id"])

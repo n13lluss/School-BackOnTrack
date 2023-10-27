@@ -121,13 +121,21 @@ namespace BackOnTrack.GUI.Controllers
         // GET: SleepResultController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            SleepResult result = _sleepService.GetById(id);
+            SleepResultViewModel delete = new()
+            {
+                Id = result.Id,
+                TimeSlept = result.HoursSlept,
+                Date = result.Date,
+
+            };
+            return View(delete);
         }
 
         // POST: SleepResultController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, string user)
+        public ActionResult Delete(int id, IFormCollection collection)
         {
 
             try
