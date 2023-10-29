@@ -9,11 +9,12 @@ namespace BackOnTrack.Core.Interfaces
 {
     public interface ISleepService
     {
-        public SleepResult CreateResult(SleepResult result);
-        public SleepResult EditResult(SleepResult result);
+        public bool CreateResult(SleepResult result);
+        public bool EditResult(SleepResult result);
         public bool DeleteResult(SleepResult result);
         public List<SleepResult> GetResultList();
-        public List<SleepResult> GetLastSevenDays(string userId);
+        public double GetAverageTimeSleptLastSevenDays(string userId);
         public SleepResult GetById(int id);
+        public SleepResult GetResultByDateAndUserId(DateTime inputDate, string userId);
     }
 }

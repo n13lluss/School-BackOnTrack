@@ -1,6 +1,4 @@
-﻿using BackOnTrack.Core.Models;
-using BackOnTrack.GUI.Models;
-using BackOnTrackGUI.Models;
+﻿using BackOnTrackGUI.Models.ToDo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,12 +9,21 @@ namespace BackOnTrackGUI.Controllers
         // GET: ToDoController
         public ActionResult Index()
         {
-            List<ToDoViewModel> toDos = new List<ToDoViewModel>();
-            return View(toDos);
+            List<ToDoIndexViewModel> models = new();
+            ToDoIndexViewModel model = new()
+            {
+                Id = 1,
+                Name = "Test 1",
+                Description = "This is a test if the description tab expandes is the test gets larger",
+                Planned = DateTime.Today,
+                Status = "Not Yet Started"
+            };
+            models.Add(model); 
+            return View(models);
         }
 
         // GET: ToDoController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details()
         {
             return View();
         }
@@ -43,7 +50,7 @@ namespace BackOnTrackGUI.Controllers
         }
 
         // GET: ToDoController/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit()
         {
             return View();
         }
@@ -64,7 +71,7 @@ namespace BackOnTrackGUI.Controllers
         }
 
         // GET: ToDoController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete()
         {
             return View();
         }

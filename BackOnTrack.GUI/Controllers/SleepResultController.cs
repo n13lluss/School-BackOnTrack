@@ -1,40 +1,32 @@
 ﻿using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Models;
 using BackOnTrack.GUI.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Elfie.Extensions;
-using Microsoft.VisualBasic.FileIO;
-using System.Threading.Channels;
 
 namespace BackOnTrack.GUI.Controllers
 {
     public class SleepResultController : Controller
     {
         private readonly ISleepService _sleepService;
+        private readonly ILogger<SleepResultController> _logger;
 
-        public SleepResultController(ISleepService sleepService)
+        public SleepResultController(ISleepService sleepService, ILogger<SleepResultController> logger)
         {
             _sleepService = sleepService;
+            _logger = logger;
         }
 
         // GET: SleepResultController
         public ActionResult Index()
         {
-            List<SleepResultViewModel> sleepResults = new List<SleepResultViewModel>();
             List<SleepResult> models = _sleepService.GetResultList();
-
-            foreach(SleepResult model in models)
+            List<SleepResultViewModel> sleepResults = models.Select(model => new SleepResultViewModel
             {
-                SleepResultViewModel sleepresult = new()
-                {
-                    Id = model.Id,
-                    TimeSlept = model.HoursSlept,
-                    Date = Convert.ToDateTime(model.Date.ToString()),
-                };
-                sleepResults.Add(sleepresult);
-            }
+                average = _sleepService.GetAverageTimeSleptLastSevenDays("4002"),
+                Id = model.Id,
+                TimeSlept = model.HoursSlept,
+                Date = Convert.ToDateTime(model.Date.ToString()),
+            }).OrderByDescending(result => result.Date).ToList();
 
             return View(sleepResults);
         }
@@ -43,8 +35,14 @@ namespace BackOnTrack.GUI.Controllers
         public ActionResult Details(int id)
         {
             SleepResult model = _sleepService.GetById(id);
+            if (model == null)
+            {
+                return NotFound();
+            }
+
             SleepResultViewModel detail = new()
             {
+                Id = model.Id,
                 Date = model.Date,
                 TimeSlept = model.HoursSlept
             };
@@ -60,39 +58,72 @@ namespace BackOnTrack.GUI.Controllers
         // POST: SleepResultController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Create(SleepResultViewModel viewModel)
         {
             try
             {
-                string? userId = "4002";
-
-                SleepResult result = new()
+                if (!ModelState.IsValid)
                 {
-                    HoursSlept = int.Parse(collection["TimeSlept"]),
-                    Date = DateTime.Parse(collection["Date"]),
+                    return View(viewModel);
+                }
+
+                string userId = "4002"; // Replace with the actual user ID
+
+                var existingResult = _sleepService.GetResultByDateAndUserId(viewModel.Date, userId);
+
+                if (existingResult.Id != 0)
+                {
+                    TempData["Notification"] = "A result for this date already exists.";
+                    return RedirectToAction("Details", new { id = existingResult.Id });
+                }
+
+                var result = new SleepResult
+                {
+                    HoursSlept = viewModel.TimeSlept,
+                    Date = viewModel.Date,
                     UserID = userId
                 };
 
-                SleepResult CreatedResult = _sleepService.CreateResult(result);
+                bool isCreated = _sleepService.CreateResult(result);
 
-                SleepResultViewModel created = new()
+                if (isCreated)
                 {
-                    TimeSlept = CreatedResult.HoursSlept,
-                    Date = CreatedResult.Date,
-                };
-
-                return RedirectToAction(nameof(Index));
+                    TempData["SuccessfullCreationNotification"] = "Result has been created successfully.";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["FailedCreation"] = "Failed to add the result";
+                    return RedirectToAction(nameof(Create));
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                _logger.LogError(ex, "An error occurred while creating a sleep result.");
+                return View(viewModel);
             }
         }
+    
+
 
         // GET: SleepResultController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            SleepResult result = _sleepService.GetById(id);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            SleepResultViewModel edit = new()
+            {
+                Id = result.Id,
+                TimeSlept = result.HoursSlept,
+                Date = result.Date,
+            };
+
+            return View(edit);
         }
 
         // POST: SleepResultController/Edit/5
@@ -102,6 +133,11 @@ namespace BackOnTrack.GUI.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return View(changes);
+                }
+
                 SleepResult change = new()
                 {
                     Id = changes.Id,
@@ -109,25 +145,42 @@ namespace BackOnTrack.GUI.Controllers
                     Date = changes.Date,
                     UserID = "4002",
                 };
-                _sleepService.EditResult(change);
-                return RedirectToAction(nameof(Index));
+
+                bool isEdited = _sleepService.EditResult(change);
+
+                if (isEdited)
+                {
+                    TempData["SuccessEditNotification"] = "Changes Successfully Saved";
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["EditErrorNotification"] = "Failed to save changes"; // Add an error message
+                    return View(changes);
+                }
             }
-            catch
+            catch(Exception ex)
             {
-                return View();
+                _logger.LogError(ex, "An error occurred while editing a sleep result.");
+                return View(changes);
             }
         }
 
         // GET: SleepResultController/Delete/5
         public ActionResult Delete(int id)
         {
-            SleepResult result = _sleepService.GetById(id);
-            SleepResultViewModel delete = new()
+            var result = _sleepService.GetById(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            var delete = new SleepResultViewModel
             {
                 Id = result.Id,
                 TimeSlept = result.HoursSlept,
                 Date = result.Date,
-
             };
             return View(delete);
         }
@@ -137,15 +190,20 @@ namespace BackOnTrack.GUI.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
-
             try
             {
-                SleepResult deleted = _sleepService.GetById(id);
+                var deleted = _sleepService.GetById(id);
+                if (deleted == null)
+                {
+                    return NotFound();
+                }
                 _sleepService.DeleteResult(deleted);
+                TempData["SuccesDeletion"] = "Result has been deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while deleting a sleep result.");
                 return View();
             }
         }

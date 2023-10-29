@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackOnTrack.Core", "BackOnT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackOnTrack.DataAccess", "BackOnTrack.DataAccess\BackOnTrack.DataAccess.csproj", "{B31FFC6D-A36F-4DA9-A3D4-4CDFEC1C56A8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackOnTrackGUI", "BackOnTrack.GUI\BackOnTrackGUI.csproj", "{720981B8-C2F4-4C05-B9A1-B4EA1729643D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackOnTrack.GUI", "BackOnTrack.GUI\BackOnTrack.GUI.csproj", "{720981B8-C2F4-4C05-B9A1-B4EA1729643D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{059F837B-B89A-4915-81F0-F25FF11D611A} = {059F837B-B89A-4915-81F0-F25FF11D611A}
 	EndProjectSection
