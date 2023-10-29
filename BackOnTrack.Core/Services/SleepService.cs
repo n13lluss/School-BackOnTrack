@@ -3,13 +3,11 @@ using BackOnTrack.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BackOnTrack.Core.Services
 {
     public class SleepService : ISleepService
-    {   
+    {
         private readonly ISleepRepository _sleepRepository;
 
         public SleepService(ISleepRepository sleepRepository)
@@ -17,57 +15,69 @@ namespace BackOnTrack.Core.Services
             _sleepRepository = sleepRepository;
         }
 
-        public SleepResult CreateResult(SleepResult result)
+        public bool CreateResult(SleepResult result)
         {
-            if(result.HoursSlept > 24)
+            if (!IsSleepResultValid(result))
             {
-                return null;
-            }
-            bool IsCreated = _sleepRepository.CreateResult(result);
-
-            if(IsCreated)
-            {
-                return result;
+                return false;
             }
 
-            return null;
+            return _sleepRepository.CreateResult(result);
         }
 
         public bool DeleteResult(SleepResult result)
         {
-            bool isDeleted = _sleepRepository.DeleteResult(result);
-            return isDeleted;
+            return _sleepRepository.DeleteResult(result);
         }
 
-        public SleepResult EditResult(SleepResult result)
+        public bool EditResult(SleepResult result)
         {
-            if (result.HoursSlept > 24)
+            if (!IsSleepResultValid(result))
             {
-                return null;
+                return false;
             }
-            bool updated = _sleepRepository.UpdateResult(result);
-            if(updated)
-            {
-                return result;
-            }
-            return null;
+
+            return _sleepRepository.UpdateResult(result);
         }
 
         public SleepResult GetById(int id)
         {
-            SleepResult result = _sleepRepository.GetById(id);
-            return result;
+            return _sleepRepository.GetById(id);
         }
 
-        public List<SleepResult> GetLastSevenDays(string userId)
+        public double GetAverageTimeSleptLastSevenDays(string userId)
         {
-            throw new NotImplementedException();
+            List<SleepResult> results = _sleepRepository.GetLastSeven();
+
+            List<SleepResult> validResults = results
+                .Where(result => result.UserID == userId && result.Date >= DateTime.Today.AddDays(-7))
+                .ToList();
+
+            if (validResults.Count == 0)
+            {
+                return 0.0; // Return 0.0 if there are no valid results in the last 7 days
+            }
+
+            double totalHoursSlept = validResults.Sum(result => result.HoursSlept);
+            double averageTimeSlept = totalHoursSlept / validResults.Count;
+
+            // Round the average to two decimal places
+            return Math.Round(averageTimeSlept, 2);
+        }
+
+        public SleepResult GetResultByDateAndUserId(DateTime inputDate, string userId)
+        {
+            return _sleepRepository.GetResultByDateAndUserId(inputDate, userId);
         }
 
         public List<SleepResult> GetResultList()
         {
-            List<SleepResult> results = _sleepRepository.GetAll();
-            return results;
+            return _sleepRepository.GetAll();
+        }
+
+        private bool IsSleepResultValid(SleepResult result)
+        {
+            return result.HoursSlept >= 0 && result.HoursSlept <= 24 && result.Date <= DateTime.Today;
         }
     }
 }

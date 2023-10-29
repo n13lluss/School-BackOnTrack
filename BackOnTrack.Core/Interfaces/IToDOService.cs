@@ -9,9 +9,9 @@ namespace BackOnTrack.Core.Interfaces
 {
     public interface IToDOService
     {
-        public ToDo CreateToDo(ToDo toDo);
-        public ToDo UpdateToDo(ToDo toDo);
-        public ToDo DeleteToDo(ToDo toDo);
+        public bool CreateToDo(ToDo toDo);
+        public bool UpdateToDo(ToDo toDo);
+        public bool DeleteToDo(ToDo toDo);
         public List<ToDo> GetAllToDos();
         public ToDo GetToDoById(int id);
         public ToDo GetToDoByName(string name);

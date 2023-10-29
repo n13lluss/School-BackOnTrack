@@ -1,6 +1,6 @@
 ﻿@model BackOnTrack.GUI.Models.SleepResultViewModel
 
-<h4>SleepResultViewModel</h4>
+<h4>Create a new sleep result</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -13,13 +13,13 @@
             </div>
             <div>
                 <label asp-for="Date" class="control-label"></label>
-                <input type="date" asp-for="Date" class="form-control" />
+                <input type="date" asp-for="Date" class="form-control" max="@DateTime.Today.ToString("yyyy-M-dd")" />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-        </form>
+        </form> 
     </div>
 </div>
 
@@ -29,4 +29,17 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function () {
+            // Check if TempData contains a success notification
+            var FailedNotification = '@TempData["FailedCreation"]';
+
+            if (FailedNotification) {
+                // Use Toastr to display the success notification
+                toastr.error(FailedNotification, "Notification");
+            }
+        });
+    </script>
 }
+

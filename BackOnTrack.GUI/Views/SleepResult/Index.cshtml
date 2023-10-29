@@ -1,5 +1,12 @@
 ﻿@model IEnumerable<BackOnTrack.GUI.Models.SleepResultViewModel>
+@{
+    // Calculate the average time slept
+    double averageTimeSlept = Math.Round(Model.Any() ? Model.Average(item => item.average) : 0, 2);
+}
 
+<p>
+    Average time slept in the last seven days: <br />@averageTimeSlept hours
+</p>
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -25,11 +32,37 @@
                 @item.Date.ToString("dddd | dd/M/yyyy")
             </td>
             <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a>
+                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
+                 <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            var successNotification = '@TempData["SuccessfullCreationNotification"]';
+
+            if (successNotification) {
+                toastr.success(successNotification, "Successfull Creation");
+            }
+        });
+        $(document).ready(function () {
+            var DeletionNotification = '@TempData["SuccesDeletion"]';
+
+            if (DeletionNotification) {
+                toastr.success(DeletionNotification, "Succesfull Deletion");
+            }
+        });
+        $(document).ready(function () {
+            var successNotification = '@TempData["SuccessEditNotification"]';
+
+            if (successNotification) {
+                toastr.success(successNotification, "Successfull Edit");
+            }
+        });
+    </script>
+}

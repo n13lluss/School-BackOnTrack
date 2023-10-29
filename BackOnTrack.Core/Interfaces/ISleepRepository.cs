@@ -15,5 +15,6 @@ namespace BackOnTrack.Core.Interfaces
         public List<SleepResult> GetAll();
         public List<SleepResult> GetLastSeven();
         public SleepResult GetById(int id);
+        public SleepResult GetResultByDateAndUserId(DateTime inputDate, string userId);
     }
 }
