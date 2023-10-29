@@ -12,9 +12,11 @@ namespace BackOnTrack.Core.Interfaces
         public bool CreateToDo(ToDo toDo);
         public bool UpdateToDo(ToDo toDo);
         public bool DeleteToDo(ToDo toDo);
+        public ToDo UpdateStatus(int id);
         public List<ToDo> GetAllToDos();
         public ToDo GetToDoById(int id);
         public ToDo GetToDoByName(string name);
+        public List<ToDo> GetToDoByDate(DateTime date);
 
     }
 }

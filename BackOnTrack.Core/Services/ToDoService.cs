@@ -10,17 +10,22 @@ namespace BackOnTrack.Core.Services
 {
     public class ToDoService : IToDOService
     {
-        public ToDo CreateToDo(ToDo toDo)
+        public bool CreateToDo(ToDo toDo)
         {
             throw new NotImplementedException();
         }
 
-        public ToDo DeleteToDo(ToDo toDo)
+        public bool DeleteToDo(ToDo toDo)
         {
             throw new NotImplementedException();
         }
 
         public List<ToDo> GetAllToDos()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ToDo> GetToDoByDate(DateTime date)
         {
             throw new NotImplementedException();
         }
@@ -35,7 +40,12 @@ namespace BackOnTrack.Core.Services
             throw new NotImplementedException();
         }
 
-        public ToDo UpdateToDo(ToDo toDo)
+        public ToDo UpdateStatus(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateToDo(ToDo toDo)
         {
             throw new NotImplementedException();
         }

@@ -26,7 +26,7 @@ namespace BackOnTrack.DataAccess
             {
                 string query = "INSERT INTO [Sleepresults] ([HoursSlept], [User_Id], [Date]) VALUES (@HoursSlept, @User_Id, @Date)";
 
-                SqlCommand command = new SqlCommand(query, sqlConnection);
+                SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@HoursSlept", result.HoursSlept);
                 command.Parameters.AddWithValue("@User_Id", int.Parse(result.UserID));
                 command.Parameters.AddWithValue("@Date", result.Date);
@@ -55,7 +55,7 @@ namespace BackOnTrack.DataAccess
             {
                 string query = "DELETE FROM [Sleepresults] WHERE [Id] = @SleepId AND [User_Id] = @UserId AND [HoursSlept] = @HoursSlept AND [Date] = @Date";
 
-                SqlCommand command = new SqlCommand(query, sqlConnection);
+                SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@SleepId", Delete.Id);
                 command.Parameters.AddWithValue("@UserId", Delete.UserID);
                 command.Parameters.AddWithValue("@HoursSlept", Delete.HoursSlept);
@@ -85,12 +85,12 @@ namespace BackOnTrack.DataAccess
 
         public List<SleepResult> GetAll()
         {
-            List<SleepResult > sleepResults = new List<SleepResult>(); 
+            List<SleepResult > sleepResults = new(); 
 
             using(sqlConnection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults]";
-                SqlCommand command = new SqlCommand(query, sqlConnection);
+                SqlCommand command = new(query, sqlConnection);
 
                 try
                 {
@@ -121,11 +121,11 @@ namespace BackOnTrack.DataAccess
 
         public SleepResult GetById(int id)
         {
-            SleepResult result = new SleepResult();
+            SleepResult result = new();
             using (sqlConnection = new(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] WHERE [Id] = @id";
-                SqlCommand command = new SqlCommand(query, sqlConnection);
+                SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@id", id);
 
                 try
@@ -156,14 +156,14 @@ namespace BackOnTrack.DataAccess
 
         public List<SleepResult> GetLastSeven()
         {
-            List<SleepResult> sleepResults = new List<SleepResult>();
+            List<SleepResult> sleepResults = new();
 
             using (sqlConnection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] " +
                                "WHERE [Date] >= DATEADD(DAY, -7, GETDATE())";
 
-                SqlCommand command = new SqlCommand(query, sqlConnection);
+                SqlCommand command = new(query, sqlConnection);
 
                 try
                 {
@@ -172,7 +172,7 @@ namespace BackOnTrack.DataAccess
                     {
                         while (reader.Read())
                         {
-                            SleepResult result = new SleepResult
+                            SleepResult result = new()
                             {
                                 Id = Convert.ToInt32(reader["Id"]),
                                 HoursSlept = Convert.ToInt32(reader["HoursSlept"]),
@@ -195,12 +195,12 @@ namespace BackOnTrack.DataAccess
 
         public SleepResult GetResultByDateAndUserId(DateTime inputDate, string userId)
         {
-            SleepResult result = null; // Initialize result as null
+            SleepResult result = new();
 
             using (SqlConnection connection = new(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] WHERE [User_Id] = @userid AND [Date] = @date";
-                SqlCommand command = new SqlCommand(query, sqlConnection);
+                SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@userid", userId);
                 command.Parameters.AddWithValue("@date", inputDate);
 
@@ -237,7 +237,7 @@ namespace BackOnTrack.DataAccess
             {
                 string query = "UPDATE [Sleepresults] SET [HoursSlept] = @NewHoursSlept WHERE [User_Id] = @UserId AND [Id] = @SleepId";
 
-                SqlCommand command = new SqlCommand(query, sqlConnection);
+                SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@NewHoursSlept", result.HoursSlept);
                 command.Parameters.AddWithValue("@UserId", result.UserID);
                 command.Parameters.AddWithValue("@SleepId", result.Id);

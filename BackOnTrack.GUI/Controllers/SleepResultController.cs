@@ -35,7 +35,7 @@ namespace BackOnTrack.GUI.Controllers
         public ActionResult Details(int id)
         {
             SleepResult model = _sleepService.GetById(id);
-            if (model.Id == null)
+            if (model == null)
             {
                 return NotFound();
             }
@@ -71,7 +71,7 @@ namespace BackOnTrack.GUI.Controllers
 
                 var existingResult = _sleepService.GetResultByDateAndUserId(viewModel.Date, userId);
 
-                if (existingResult != null)
+                if (existingResult.Id != 0)
                 {
                     TempData["Notification"] = "A result for this date already exists.";
                     return RedirectToAction("Details", new { id = existingResult.Id });

@@ -55,13 +55,12 @@ namespace BackOnTrack.Core.Services
 
             if (validResults.Count == 0)
             {
-                return 0.0; // Return 0.0 if there are no valid results in the last 7 days
+                return 0.0;
             }
 
             double totalHoursSlept = validResults.Sum(result => result.HoursSlept);
             double averageTimeSlept = totalHoursSlept / validResults.Count;
 
-            // Round the average to two decimal places
             return Math.Round(averageTimeSlept, 2);
         }
 

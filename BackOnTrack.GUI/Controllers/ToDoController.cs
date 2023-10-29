@@ -1,7 +1,4 @@
-﻿using BackOnTrack.Core.Interfaces;
-using BackOnTrack.Core.Models;
-using BackOnTrack.GUI.Models;
-using BackOnTrackGUI.Models;
+﻿using BackOnTrackGUI.Models.ToDo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,43 +6,24 @@ namespace BackOnTrackGUI.Controllers
 {
     public class ToDoController : Controller
     {
-
-        private readonly IToDOService _ToDoService;
-
-        public ToDoController(IToDOService toDoService)
-        {
-            _ToDoService = toDoService;
-        }
         // GET: ToDoController
         public ActionResult Index()
         {
-            List<ToDoViewModel> toDos = new List<ToDoViewModel>();
-            //List<ToDo> ToDoModels = _ToDoService.GetAllToDos();
-            //foreach (ToDo toDo in ToDoModels)
-            //{
-            //    ToDoViewModel toDoViewModel = new()
-            //    {
-            //        Title =  toDo.Name,
-            //        Description = toDo.Description,
-            //        Planned = toDo.PlannedDate
-            //    };
-            //    toDos.Add(toDoViewModel);
-            //}
-            ToDoViewModel toDo = new()
+            List<ToDoIndexViewModel> models = new();
+            ToDoIndexViewModel model = new()
             {
-                Title = "This is a test run",
-                Description = "this is a test file where im testing if the ui works correctly",
-                Planned = DateTime.Now,
-                Status = 1
+                Id = 1,
+                Name = "Test 1",
+                Description = "This is a test if the description tab expandes is the test gets larger",
+                Planned = DateTime.Today,
+                Status = "Not Yet Started"
             };
-
-            toDos.Add(toDo);
-
-            return View(toDos);
+            models.Add(model); 
+            return View(models);
         }
 
         // GET: ToDoController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details()
         {
             return View();
         }
@@ -72,7 +50,7 @@ namespace BackOnTrackGUI.Controllers
         }
 
         // GET: ToDoController/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit()
         {
             return View();
         }
@@ -93,7 +71,7 @@ namespace BackOnTrackGUI.Controllers
         }
 
         // GET: ToDoController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete()
         {
             return View();
         }
