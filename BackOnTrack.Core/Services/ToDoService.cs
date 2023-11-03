@@ -10,19 +10,26 @@ namespace BackOnTrack.Core.Services
 {
     public class ToDoService : IToDOService
     {
+        private readonly IToDoRepository _toDoRepository;
+
+        public ToDoService(IToDoRepository ToDoRepository)
+        {
+            _toDoRepository = ToDoRepository;
+        }
         public bool CreateToDo(ToDo toDo)
         {
-            throw new NotImplementedException();
+            toDo.Description ??= string.Empty;
+            return _toDoRepository.CreateToDo(toDo);
         }
 
         public bool DeleteToDo(ToDo toDo)
         {
-            throw new NotImplementedException();
+            return _toDoRepository.DeleteToDo(toDo);
         }
 
-        public List<ToDo> GetAllToDos()
+        public List<ToDo> GetAllToDos(string Username)
         {
-            throw new NotImplementedException();
+            return _toDoRepository.GetAllToDos(Username);
         }
 
         public List<ToDo> GetToDoByDate(DateTime date)
@@ -32,22 +39,43 @@ namespace BackOnTrack.Core.Services
 
         public ToDo GetToDoById(int id)
         {
-            throw new NotImplementedException();
+            return _toDoRepository.GetToDoById(id);
         }
 
-        public ToDo GetToDoByName(string name)
+        public List<ToDo> GetToDoByName(string name, string userId)
         {
-            throw new NotImplementedException();
+            return _toDoRepository.GetToDoByName(name, userId);
+        }
+
+        public ToDo GetToDoByNameOnDate(string name, string userId, DateTime ondate)
+        {
+            return _toDoRepository.GetToDoByNameOnDate(name, userId, ondate);
         }
 
         public ToDo UpdateStatus(int id)
         {
-            throw new NotImplementedException();
+            var result = _toDoRepository.GetToDoById(id);
+            if(result.Status >= 2)
+            {
+                if (_toDoRepository.UpdateStatus(id, 0))
+                {
+                    result.Status = 0;
+                    return result;
+                }
+            }
+            if (_toDoRepository.UpdateStatus(id, result.Status + 1)) {
+                result.Status++;
+                return result;
+            };
+            
+            ToDo toDo = new ToDo();
+            return toDo;
         }
 
         public bool UpdateToDo(ToDo toDo)
         {
-            throw new NotImplementedException();
+            toDo.Description ??= string.Empty;
+            return _toDoRepository.UpdateToDo(toDo);
         }
     }
 }

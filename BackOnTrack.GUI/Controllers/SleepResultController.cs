@@ -22,13 +22,18 @@ namespace BackOnTrack.GUI.Controllers
             List<SleepResult> models = _sleepService.GetResultList();
             List<SleepResultViewModel> sleepResults = models.Select(model => new SleepResultViewModel
             {
-                average = _sleepService.GetAverageTimeSleptLastSevenDays("4002"),
                 Id = model.Id,
                 TimeSlept = model.HoursSlept,
                 Date = Convert.ToDateTime(model.Date.ToString()),
-            }).OrderByDescending(result => result.Date).ToList();
+            }).ToList();
 
-            return View(sleepResults);
+            SleepResultViewModelIndex indexData = new()
+            {
+                AverageTimeSlept = _sleepService.GetAverageTimeSleptLastSevenDays("4002"),
+                AllResults = sleepResults
+            };
+
+            return View(indexData);
         }
 
         // GET: SleepResultController/Details/5

@@ -89,7 +89,7 @@ namespace BackOnTrack.DataAccess
 
             using(sqlConnection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults]";
+                string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] ORDER BY [Date] desc";
                 SqlCommand command = new(query, sqlConnection);
 
                 try
@@ -161,7 +161,7 @@ namespace BackOnTrack.DataAccess
             using (sqlConnection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] " +
-                               "WHERE [Date] >= DATEADD(DAY, -7, GETDATE())";
+                               "WHERE [Date] >= DATEADD(DAY, -7, GETDATE())  ORDER BY [Date] desc";
 
                 SqlCommand command = new(query, sqlConnection);
 

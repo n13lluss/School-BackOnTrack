@@ -74,7 +74,7 @@ namespace BackOnTrack.Core.Services
             return _sleepRepository.GetAll();
         }
 
-        private bool IsSleepResultValid(SleepResult result)
+        private static bool IsSleepResultValid(SleepResult result)
         {
             return result.HoursSlept >= 0 && result.HoursSlept <= 24 && result.Date <= DateTime.Today;
         }

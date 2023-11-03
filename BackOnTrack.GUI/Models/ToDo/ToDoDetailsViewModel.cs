@@ -8,10 +8,10 @@ namespace BackOnTrackGUI.Models.ToDo
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         [Required]
         public DateTime Planned { get; set; }
         [Required]
-        public int Status { get; set; }
+        public string Status { get; set; }
     }
 }

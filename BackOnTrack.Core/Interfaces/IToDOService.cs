@@ -13,9 +13,10 @@ namespace BackOnTrack.Core.Interfaces
         public bool UpdateToDo(ToDo toDo);
         public bool DeleteToDo(ToDo toDo);
         public ToDo UpdateStatus(int id);
-        public List<ToDo> GetAllToDos();
+        public List<ToDo> GetAllToDos(string userID);
         public ToDo GetToDoById(int id);
-        public ToDo GetToDoByName(string name);
+        public List<ToDo> GetToDoByName(string name, string userId);
+        public ToDo GetToDoByNameOnDate(string name, string userId, DateTime ondate);
         public List<ToDo> GetToDoByDate(DateTime date);
 
     }
