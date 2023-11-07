@@ -17,8 +17,7 @@ namespace BackOnTrack.GUI.Controllers
 
         public ActionResult Index()
         {
-            List<StressResult> results = _stressService.GetAllStressResults("4002"); // Replace "userId" with the actual user identifier.
-            Console.WriteLine("test");
+            List<StressResult> results = _stressService.GetAllStressResults("4002");
             List<StressResultViewModel> viewmodels = results.Select(r => new StressResultViewModel()
             {
                 Id = r.Id,
