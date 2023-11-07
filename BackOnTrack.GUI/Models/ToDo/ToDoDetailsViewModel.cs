@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BackOnTrackGUI.Models.ToDo
+namespace BackOnTrack.GUI.Models.ToDo
 {
     public class ToDoDetailsViewModel
     {

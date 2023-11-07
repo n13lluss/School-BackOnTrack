@@ -1,13 +1,9 @@
 ﻿using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Models;
-using BackOnTrack.Core.Services;
-using BackOnTrack.GUI.Models;
-using BackOnTrackGUI.Models.ToDo;
+using BackOnTrack.GUI.Models.ToDo;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Threading.Channels;
 
-namespace BackOnTrackGUI.Controllers
+namespace BackOnTrack.GUI.Controllers
 {
     public class ToDoController : Controller
     {

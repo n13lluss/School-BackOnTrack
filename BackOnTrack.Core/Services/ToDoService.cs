@@ -1,10 +1,5 @@
 ﻿using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BackOnTrack.Core.Services
 {
@@ -16,20 +11,42 @@ namespace BackOnTrack.Core.Services
         {
             _toDoRepository = ToDoRepository;
         }
+
         public bool CreateToDo(ToDo toDo)
         {
-            toDo.Description ??= string.Empty;
-            return _toDoRepository.CreateToDo(toDo);
+            try
+            {
+                toDo.Description ??= string.Empty;
+                return _toDoRepository.CreateToDo(toDo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred when creating a ToDo item. Check the input or the database operation.", ex);
+            }
         }
 
         public bool DeleteToDo(ToDo toDo)
         {
-            return _toDoRepository.DeleteToDo(toDo);
+            try
+            {
+                return _toDoRepository.DeleteToDo(toDo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred when deleting a ToDo item. Check the input or the database operation.", ex);
+            }
         }
 
         public List<ToDo> GetAllToDos(string Username)
         {
-            return _toDoRepository.GetAllToDos(Username);
+            try
+            {
+                return _toDoRepository.GetAllToDos(Username);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to retrieve the list of ToDo items.", ex);
+            }
         }
 
         public List<ToDo> GetToDoByDate(DateTime date)
@@ -39,43 +56,81 @@ namespace BackOnTrack.Core.Services
 
         public ToDo GetToDoById(int id)
         {
-            return _toDoRepository.GetToDoById(id);
+            try
+            {
+                return _toDoRepository.GetToDoById(id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message, "An error occurred when trying to get a ToDo item.");
+                return new ToDo();
+            }
         }
 
         public List<ToDo> GetToDoByName(string name, string userId)
         {
-            return _toDoRepository.GetToDoByName(name, userId);
+            try
+            {
+                return _toDoRepository.GetToDoByName(name, userId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred when retrieving ToDo items by name and user ID.", ex);
+            }
         }
 
         public ToDo GetToDoByNameOnDate(string name, string userId, DateTime ondate)
         {
-            return _toDoRepository.GetToDoByNameOnDate(name, userId, ondate);
+            try
+            {
+                return _toDoRepository.GetToDoByNameOnDate(name, userId, ondate);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message, "An error occurred when trying to get a ToDo item by name and date.");
+                return new ToDo();
+            }
         }
 
         public ToDo UpdateStatus(int id)
         {
-            var result = _toDoRepository.GetToDoById(id);
-            if(result.Status >= 2)
+            try
             {
-                if (_toDoRepository.UpdateStatus(id, 0))
+                var result = _toDoRepository.GetToDoById(id);
+                if (result.Status >= 2)
                 {
-                    result.Status = 0;
+                    if (_toDoRepository.UpdateStatus(id, 0))
+                    {
+                        result.Status = 0;
+                        return result;
+                    }
+                }
+                if (_toDoRepository.UpdateStatus(id, result.Status + 1))
+                {
+                    result.Status++;
                     return result;
                 }
+
+                ToDo toDo = new ToDo();
+                return toDo;
             }
-            if (_toDoRepository.UpdateStatus(id, result.Status + 1)) {
-                result.Status++;
-                return result;
-            };
-            
-            ToDo toDo = new ToDo();
-            return toDo;
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred when updating the status of a ToDo item.", ex);
+            }
         }
 
         public bool UpdateToDo(ToDo toDo)
         {
-            toDo.Description ??= string.Empty;
-            return _toDoRepository.UpdateToDo(toDo);
+            try
+            {
+                toDo.Description ??= string.Empty;
+                return _toDoRepository.UpdateToDo(toDo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred when updating a ToDo item. Check the input or the database operation.", ex);
+            }
         }
     }
 }

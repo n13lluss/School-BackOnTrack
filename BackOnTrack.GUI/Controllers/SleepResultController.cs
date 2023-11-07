@@ -1,6 +1,6 @@
 ﻿using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Models;
-using BackOnTrack.GUI.Models;
+using BackOnTrack.GUI.Models.SleepResult;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackOnTrack.GUI.Controllers

@@ -1,29 +1,17 @@
 ﻿using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Models;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace BackOnTrack.DataAccess
 {
     public class ToDoRepository : IToDoRepository
     {
         private readonly string? _connectionString;
-        private readonly IConfiguration _configuration;
         private SqlConnection sqlConnection;
-        public ToDoRepository()
+        public ToDoRepository(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json");
-
-            _configuration = builder.Build();
-            this._connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
             sqlConnection = new SqlConnection(_connectionString);
         }
         public bool CreateToDo(ToDo toDo)
@@ -247,7 +235,7 @@ namespace BackOnTrack.DataAccess
 
         public bool UpdateStatus(int id, int status)
         {
-            using (SqlConnection sqlConnection = new(_connectionString))
+            using (sqlConnection = new(_connectionString))
             {
                 string query = "UPDATE [ToDo] SET [Status] = @status WHERE [Id] = @id";
 
@@ -273,7 +261,7 @@ namespace BackOnTrack.DataAccess
 
         public bool UpdateToDo(ToDo toDo)
         {
-            using (SqlConnection sqlConnection = new(_connectionString))
+            using (sqlConnection = new(_connectionString))
             {
                 string query = "UPDATE [ToDo] SET [Name] = @name, [Description] = @description, [Date] = @date, [Status] = @status WHERE [Id] = @id AND [User_Id] = @userId";
 

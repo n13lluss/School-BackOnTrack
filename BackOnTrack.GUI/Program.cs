@@ -1,7 +1,6 @@
 using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Services;
 using BackOnTrack.DataAccess;
-using System.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
