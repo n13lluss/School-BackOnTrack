@@ -5,7 +5,8 @@ namespace BackOnTrack.GUI.Models.Stress
 {
     public class DetailsStressViewModel
     {
-        public int Result { get; set; }
+        public int Id { get; set; }
+        public string Result { get; set; }
         public DateTime date { get; set; }
         public int SleptLastNight { get; set; }
         public int TasksPlanned { get; set; }

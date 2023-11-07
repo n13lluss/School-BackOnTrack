@@ -3,7 +3,7 @@
     public class StressResultViewModel
     {
         public int Id { get; set; }
-        public int Result { get; set; }
+        public string Result { get; set; }
         public DateTime Date { get; set; }
         public int HoursSlept { get; set; }
     }

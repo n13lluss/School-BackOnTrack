@@ -114,10 +114,47 @@ namespace BackOnTrack.DataAccess
             return results;
         }
 
-        public List<ToDo> GetToDoByDate(DateTime date)
+        public List<ToDo> GetToDoByDate(DateTime date, string userId)
         {
-            throw new NotImplementedException();
+            List<ToDo> todoList = new List<ToDo>();
+
+            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT [Id], [Name], [Description], [Date], [User_Id], [Status] FROM [ToDo] WHERE [Date] = @date AND [User_Id] = @userId";
+                SqlCommand command = new SqlCommand(query, sqlConnection);
+                command.Parameters.AddWithValue("@date", date);
+                command.Parameters.AddWithValue("@userId", userId);
+
+                try
+                {
+                    sqlConnection.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ToDo todo = new ToDo
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Name = Convert.ToString(reader["Name"]),
+                                Description = Convert.ToString(reader["Description"]),
+                                PlannedDate = Convert.ToDateTime(reader["Date"]),
+                                UserId = Convert.ToString(reader["User_Id"]),
+                                Status = Convert.ToInt32(reader["Status"])
+                            };
+                            todoList.Add(todo);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Handle or log the exception as needed.
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            return todoList;
         }
+
 
         public ToDo GetToDoById(int id)
         {

@@ -8,8 +8,9 @@ namespace BackOnTrack.Core.Interfaces
     {
         bool CreateStressResult(StressResult stressResult);
         bool UpdateStressResult(StressResult stressResult);
-        bool DeleteStressResult(DateTime date);
+        bool DeleteStressResult(StressResult stressResult);
         List<StressResult> GetAllStressResults(string userId);
-        StressResult GetStressResultById(int Id, string UserId);
+        StressResult GetStressResultById(int Id);
+        StressResult GetStressResultByDateAndId(DateTime date, string Id);
     }
 }

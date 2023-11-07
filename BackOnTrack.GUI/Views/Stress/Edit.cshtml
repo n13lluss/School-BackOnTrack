@@ -7,8 +7,9 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Result" class="control-label"></label>
-                <input asp-for="Result" class="form-control" />
+                <label asp-for="Result" class="control-label">Result:</label> <br />
+                <input type="range" id="slider" name="Result" asp-for="Result" min="0" max="6" step="1" value="@Model.Result" oninput="updateValue(this.value)" />
+                <div id="selectedValue">None</div>
                 <span asp-validation-for="Result" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -26,7 +27,33 @@
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function updateValue(value) {
+            // Map the slider value to the enum values
+            const enumValues = ['None', 'Very Low', 'Low', 'Medium', 'High', 'Very High', 'Extremely High'];
+            const selectedValue = enumValues[value];
+
+            // Update the displayed value
+            document.getElementById('selectedValue').textContent = selectedValue;
+        }
+
+        // Initialize the selectedValue with the initial value
+        document.addEventListener('DOMContentLoaded', function () {
+            const initialSliderValue = @Model.Result;
+            updateValue(initialSliderValue);
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var errorNotification = '@TempData["EditErrorNotification"]';
+
+            if (errorNotification) {
+                toastr.error(errorNotification, "Error");
+            }
+        });
+    </script>
 }

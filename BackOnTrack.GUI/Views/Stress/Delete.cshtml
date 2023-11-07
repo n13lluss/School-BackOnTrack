@@ -15,7 +15,7 @@
             @Html.DisplayNameFor(model => model.date)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.date)
+            @Model.date.ToString("dddd | dd/M/yyyy")
         </dd>
     </dl>
     
@@ -24,3 +24,18 @@
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Check if TempData contains a success notification
+            var Notification = '@TempData["SuccesDeletion"]';
+
+            if (Notification) {
+                // Use Toastr to display the success notification
+                toastr.succes(Notification, "SuccesDeletion");
+            }
+        });
+    </script>
+
+}

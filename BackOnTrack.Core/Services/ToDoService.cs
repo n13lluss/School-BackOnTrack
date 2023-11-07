@@ -49,9 +49,9 @@ namespace BackOnTrack.Core.Services
             }
         }
 
-        public List<ToDo> GetToDoByDate(DateTime date)
+        public List<ToDo> GetToDoByDate(DateTime date, string userId)
         {
-            throw new NotImplementedException();
+            return _toDoRepository.GetToDoByDate(date, userId);
         }
 
         public ToDo GetToDoById(int id)

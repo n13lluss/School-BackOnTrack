@@ -1,19 +1,19 @@
 ﻿@model IEnumerable<BackOnTrack.GUI.Models.Stress.StressResultViewModel>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Result)
+                Experienced stress level
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Date)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.HoursSlept)
+                Hours slept last night
             </th>
             <th></th>
         </tr>
@@ -22,7 +22,7 @@
 @foreach (var item in Model) {
         <tr>    
             <td>
-                Level @Html.DisplayFor(modelItem => item.Result) stress expierenced
+                @Html.DisplayFor(modelItem => item.Result)
             </td>
             <td>
                 @item.Date.ToString("dddd | dd/M/yyyy")
@@ -31,11 +31,43 @@
                 @Html.DisplayFor(modelItem => item.HoursSlept)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+@section scripts {
+    <script>
+        function confirmDelete() {
+            var confirmDelete = confirm("Are you sure you want to delete this item?");
+            return confirmDelete;
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            var successNotification = '@TempData["SuccessfullCreationNotification"]';
+
+            if (successNotification) {
+                toastr.success(successNotification, "Successfull Creation");
+            }
+        });
+        $(document).ready(function () {
+            var DeletionNotification = '@TempData["SuccesDeletion"]';
+
+            if (DeletionNotification) {
+                toastr.success(DeletionNotification, "Succesfull Deletion");
+            }
+        });
+        $(document).ready(function () {
+            var successNotification = '@TempData["SuccessEditNotification"]';
+
+            if (successNotification) {
+                toastr.success(successNotification, "Successfull Edit");
+            }
+        });
+    </script>
+}

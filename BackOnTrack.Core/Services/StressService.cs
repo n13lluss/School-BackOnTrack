@@ -14,12 +14,12 @@ namespace BackOnTrack.Core.Services
 
         public bool CreateStressResult(StressResult stressResult)
         {
-            throw new NotImplementedException();
+            return _repository.CreateResult(stressResult);
         }
 
-        public bool DeleteStressResult(DateTime date)
+        public bool DeleteStressResult(StressResult stressResult)
         {
-            throw new NotImplementedException();
+            return _repository.DeleteResult(stressResult);
         }
 
         public List<StressResult> GetAllStressResults(string userId)
@@ -32,14 +32,24 @@ namespace BackOnTrack.Core.Services
             return results;
         }
 
-        public StressResult GetStressResultById(int Id, string UserId)
+        public StressResult GetStressResultByDateAndId(DateTime date, string userId)
         {
-            throw new NotImplementedException();
+            var result = _repository.GetStressByDateAndId(date, userId);
+            if(result == null)
+            {
+                return new StressResult();
+            }
+            return result;
+        }
+
+        public StressResult GetStressResultById(int Id)
+        {
+            return _repository.GetResultById(Id);
         }
 
         public bool UpdateStressResult(StressResult stressResult)
         {
-            throw new NotImplementedException();
+            return _repository.EditResult(stressResult);
         }
     }
 }

@@ -12,6 +12,6 @@ namespace BackOnTrack.Core.Interfaces
         public ToDo GetToDoById(int id);
         public List<ToDo> GetToDoByName(string name, string userId);
         public ToDo GetToDoByNameOnDate(string name, string userId, DateTime ondate);
-        public List<ToDo> GetToDoByDate(DateTime date);
+        public List<ToDo> GetToDoByDate(DateTime date, string userId);
     }
 }
