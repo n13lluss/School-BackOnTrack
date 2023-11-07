@@ -8,16 +8,10 @@ namespace BackOnTrack.DataAccess
     public class SleepRepository : ISleepRepository
     {
         private readonly string? _connectionString;
-        private readonly IConfiguration _configuration;
         private SqlConnection sqlConnection;
-        public SleepRepository()
+        public SleepRepository(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json");
-
-            _configuration = builder.Build();
-            this._connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
             sqlConnection = new SqlConnection(_connectionString);
         }
         public bool CreateResult(SleepResult result)
@@ -89,7 +83,7 @@ namespace BackOnTrack.DataAccess
 
             using(sqlConnection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults]";
+                string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] ORDER BY [Date] desc";
                 SqlCommand command = new(query, sqlConnection);
 
                 try
@@ -122,7 +116,7 @@ namespace BackOnTrack.DataAccess
         public SleepResult GetById(int id)
         {
             SleepResult result = new();
-            using (sqlConnection = new(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] WHERE [Id] = @id";
                 SqlCommand command = new(query, sqlConnection);
@@ -161,7 +155,7 @@ namespace BackOnTrack.DataAccess
             using (sqlConnection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] " +
-                               "WHERE [Date] >= DATEADD(DAY, -7, GETDATE())";
+                               "WHERE [Date] >= DATEADD(DAY, -7, GETDATE())  ORDER BY [Date] desc";
 
                 SqlCommand command = new(query, sqlConnection);
 

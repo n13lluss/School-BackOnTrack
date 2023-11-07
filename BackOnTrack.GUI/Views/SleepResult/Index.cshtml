@@ -1,11 +1,7 @@
-﻿@model IEnumerable<BackOnTrack.GUI.Models.SleepResultViewModel>
-@{
-    // Calculate the average time slept
-    double averageTimeSlept = Math.Round(Model.Any() ? Model.Average(item => item.average) : 0, 2);
-}
+﻿@model BackOnTrack.GUI.Models.SleepResult.SleepResultViewModelIndex
 
 <p>
-    Average time slept in the last seven days: <br />@averageTimeSlept hours
+    Average time slept in the last seven days: <br />@Model.AverageTimeSlept hours
 </p>
 <p>
     <a asp-action="Create" class="btn btn-primary">Create New</a>
@@ -14,16 +10,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.TimeSlept)
+                Hours Slept
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Date)
+                Date
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.AllResults) {
         <tr>
             <td>
                 @item.TimeSlept <span>Hours slept</span>
@@ -32,8 +28,8 @@
                 @item.Date.ToString("dddd | dd/M/yyyy")
             </td>
             <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">Details</a>
+                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">Details</a>
                  <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
             </td>
         </tr>

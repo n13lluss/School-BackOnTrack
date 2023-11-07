@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BackOnTrack.GUI.Enums;
 
-namespace BackOnTrackGUI.Models.ToDo
+namespace BackOnTrack.GUI.Models.ToDo
 {
     public class ToDoIndexViewModel
     {

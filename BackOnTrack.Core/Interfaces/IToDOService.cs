@@ -1,9 +1,4 @@
 ﻿using BackOnTrack.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BackOnTrack.Core.Interfaces
 {
@@ -13,10 +8,11 @@ namespace BackOnTrack.Core.Interfaces
         public bool UpdateToDo(ToDo toDo);
         public bool DeleteToDo(ToDo toDo);
         public ToDo UpdateStatus(int id);
-        public List<ToDo> GetAllToDos();
+        public List<ToDo> GetAllToDos(string userID);
         public ToDo GetToDoById(int id);
-        public ToDo GetToDoByName(string name);
-        public List<ToDo> GetToDoByDate(DateTime date);
+        public List<ToDo> GetToDoByName(string name, string userId);
+        public ToDo GetToDoByNameOnDate(string name, string userId, DateTime ondate);
+        public List<ToDo> GetToDoByDate(DateTime date, string userId);
 
     }
 }

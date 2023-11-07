@@ -1,0 +1,59 @@
+﻿@model BackOnTrack.GUI.Models.Stress.EditStressViewModel
+
+<h4>EditStressViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Result" class="control-label">Result:</label> <br />
+                <input type="range" id="slider" name="Result" asp-for="Result" min="0" max="6" step="1" value="@Model.Result" oninput="updateValue(this.value)" />
+                <div id="selectedValue">None</div>
+                <span asp-validation-for="Result" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="date" class="control-label"></label>
+                <input type="date" asp-for="date" class="form-control" />
+                <span asp-validation-for="date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function updateValue(value) {
+            // Map the slider value to the enum values
+            const enumValues = ['None', 'Very Low', 'Low', 'Medium', 'High', 'Very High', 'Extremely High'];
+            const selectedValue = enumValues[value];
+
+            // Update the displayed value
+            document.getElementById('selectedValue').textContent = selectedValue;
+        }
+
+        // Initialize the selectedValue with the initial value
+        document.addEventListener('DOMContentLoaded', function () {
+            const initialSliderValue = @Model.Result;
+            updateValue(initialSliderValue);
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var errorNotification = '@TempData["EditErrorNotification"]';
+
+            if (errorNotification) {
+                toastr.error(errorNotification, "Error");
+            }
+        });
+    </script>
+}

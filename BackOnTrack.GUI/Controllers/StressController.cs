@@ -1,69 +1,72 @@
 ﻿using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Models;
+using BackOnTrack.Core.Services;
 using BackOnTrack.GUI.Models.SleepResult;
+using BackOnTrack.GUI.Models.Stress;
+using BackOnTrack.GUI.Models.ToDo;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Differencing;
 
 namespace BackOnTrack.GUI.Controllers
 {
-    public class SleepResultController : Controller
+    public class StressController : Controller
     {
-        private readonly ISleepService _sleepService;
-        private readonly ILogger<SleepResultController> _logger;
+        private readonly IStressService _stressService;
+        private readonly IToDOService _todoService;
+        private readonly ILogger<StressController> _logger;
 
-        public SleepResultController(ISleepService sleepService, ILogger<SleepResultController> logger)
+        public StressController(IStressService stressService, IToDOService toDOService, ILogger<StressController> logger)
         {
-            _sleepService = sleepService;
+            _stressService = stressService;
+            _todoService = toDOService;
             _logger = logger;
         }
 
-        // GET: SleepResultController
         public ActionResult Index()
         {
-            List<SleepResult> models = _sleepService.GetResultList();
-            List<SleepResultViewModel> sleepResults = models.Select(model => new SleepResultViewModel
+            List<StressResult> results = _stressService.GetAllStressResults("4002");
+            List<StressResultViewModel> viewmodels = results.Select(r => new StressResultViewModel()
             {
-                Id = model.Id,
-                TimeSlept = model.HoursSlept,
-                Date = Convert.ToDateTime(model.Date.ToString()),
+                Id = r.Id,
+                Result = r.GetStressAsString(),
+                Date = r.date,
+                HoursSlept = r.HoursSlept
             }).ToList();
 
-            SleepResultViewModelIndex indexData = new()
-            {
-                AverageTimeSlept = _sleepService.GetAverageTimeSleptLastSevenDays("4002"),
-                AllResults = sleepResults
-            };
-
-            return View(indexData);
+            return View(viewmodels);
         }
 
-        // GET: SleepResultController/Details/5
+        // GET: StressController/Details/5
         public ActionResult Details(int id)
         {
-            SleepResult model = _sleepService.GetById(id);
-            if (model == null)
-            {
-                return NotFound();
-            }
-
-            SleepResultViewModel detail = new()
+            string userId = "4002";
+            StressResult model = _stressService.GetStressResultById(id);
+            DetailsStressViewModel viewModel = new()
             {
                 Id = model.Id,
-                Date = model.Date,
-                TimeSlept = model.HoursSlept
+                date = model.date,
+                Result = model.GetStressAsString(),
+                SleptLastNight = model.HoursSlept,
+                TasksPlanned = _todoService.GetToDoByDate(model.date, userId).Count(),
+                ToDos = _todoService.GetToDoByDate(model.date, userId).Select(todo => new ToDoIndexViewModel()
+                {
+                    Name = todo.Name,
+                    Description = todo.Description
+                }).ToList()
             };
-            return View(detail);
+            return View(viewModel);
         }
 
-        // GET: SleepResultController/Create
+        // GET: StressController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: SleepResultController/Create
+        // POST: StressController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(SleepResultViewModel viewModel)
+        public ActionResult Create(CreateStressViewModel viewModel)
         {
             try
             {
@@ -74,7 +77,7 @@ namespace BackOnTrack.GUI.Controllers
 
                 string userId = "4002"; // Replace with the actual user ID
 
-                var existingResult = _sleepService.GetResultByDateAndUserId(viewModel.Date, userId);
+                var existingResult = _stressService.GetStressResultByDateAndId(viewModel.date, userId);
 
                 if (existingResult.Id != 0)
                 {
@@ -82,14 +85,14 @@ namespace BackOnTrack.GUI.Controllers
                     return RedirectToAction("Details", new { id = existingResult.Id });
                 }
 
-                var result = new SleepResult
+                var result = new StressResult
                 {
-                    HoursSlept = viewModel.TimeSlept,
-                    Date = viewModel.Date,
-                    UserID = userId
+                    StressLevel = viewModel.Result,
+                    date = viewModel.date,
+                    UserId = userId,
                 };
 
-                bool isCreated = _sleepService.CreateResult(result);
+                bool isCreated = _stressService.CreateStressResult(result);
 
                 if (isCreated)
                 {
@@ -108,34 +111,33 @@ namespace BackOnTrack.GUI.Controllers
                 return View(viewModel);
             }
         }
-    
 
-
-        // GET: SleepResultController/Edit/5
+        // GET: StressController/Edit/5
         public ActionResult Edit(int id)
         {
-            SleepResult result = _sleepService.GetById(id);
+            StressResult result = _stressService.GetStressResultById(id);
 
             if (result == null)
             {
                 return NotFound();
             }
 
-            SleepResultViewModel edit = new()
+            EditStressViewModel edit = new()
             {
                 Id = result.Id,
-                TimeSlept = result.HoursSlept,
-                Date = result.Date,
+                date = result.date,
+                Result = result.StressLevel
             };
 
             return View(edit);
         }
 
-        // POST: SleepResultController/Edit/5
+        // POST: StressController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(SleepResultViewModel changes)
+        public ActionResult Edit(EditStressViewModel changes)
         {
+            string userId = "4002";
             try
             {
                 if (!ModelState.IsValid)
@@ -143,15 +145,15 @@ namespace BackOnTrack.GUI.Controllers
                     return View(changes);
                 }
 
-                SleepResult change = new()
+                StressResult change = new()
                 {
                     Id = changes.Id,
-                    HoursSlept = changes.TimeSlept,
-                    Date = changes.Date,
-                    UserID = "4002",
+                    StressLevel = changes.Result,
+                    date = changes.date,
+                    UserId = userId     
                 };
 
-                bool isEdited = _sleepService.EditResult(change);
+                bool isEdited = _stressService.UpdateStressResult(change);
 
                 if (isEdited)
                 {
@@ -165,44 +167,44 @@ namespace BackOnTrack.GUI.Controllers
                     return View(changes);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while editing a sleep result.");
                 return View(changes);
             }
         }
 
-        // GET: SleepResultController/Delete/5
+        // GET: StressController/Delete/5
         public ActionResult Delete(int id)
         {
-            var result = _sleepService.GetById(id);
+            var result = _stressService.GetStressResultById(id);
             if (result == null)
             {
                 return NotFound();
             }
 
-            var delete = new SleepResultViewModel
+            var delete = new DeleteStressResultViewModel
             {
                 Id = result.Id,
-                TimeSlept = result.HoursSlept,
-                Date = result.Date,
+                Result = result.GetStressAsString(),
+                date = result.date
             };
             return View(delete);
         }
 
-        // POST: SleepResultController/Delete/5
+        // POST: StressController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
             try
             {
-                var deleted = _sleepService.GetById(id);
+                var deleted = _stressService.GetStressResultById(id);
                 if (deleted == null)
                 {
                     return NotFound();
                 }
-                _sleepService.DeleteResult(deleted);
+                _stressService.DeleteStressResult(deleted);
                 TempData["SuccesDeletion"] = "Result has been deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }

@@ -1,4 +1,4 @@
-﻿@model BackOnTrack.GUI.Models.SleepResultViewModel
+﻿@model BackOnTrack.GUI.Models.SleepResult.SleepResultViewModel
 
 <div>
     <h4>Sleep result details</h4>
@@ -14,7 +14,7 @@
             @Html.DisplayNameFor(model => model.Date)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Date)
+            @Model.Date.ToString("dddd | dd/M/yyyy")
         </dd>
     </dl>
 </div>

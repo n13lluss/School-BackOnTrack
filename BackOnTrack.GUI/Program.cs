@@ -1,7 +1,6 @@
 using BackOnTrack.Core.Interfaces;
 using BackOnTrack.Core.Services;
 using BackOnTrack.DataAccess;
-using System.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +9,9 @@ builder.Services.AddScoped<ISleepRepository, SleepRepository>();
 
 builder.Services.AddScoped<IToDOService, ToDoService>();
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
+
+builder.Services.AddScoped<IStressService, StressService>();
+builder.Services.AddScoped<IStressRepository, StressRepository>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
