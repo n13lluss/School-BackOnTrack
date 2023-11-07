@@ -1,19 +1,40 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BackOnTrack.Core.Interfaces;
+using BackOnTrack.Core.Models;
+using BackOnTrack.GUI.Models.SleepResult;
+using BackOnTrack.GUI.Models.Stress;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BackOnTrack.GUI.Controllers
 {
     public class StressController : Controller
     {
-        // GET: StressController
+        private readonly IStressService _stressService;
+
+        public StressController(IStressService stressService)
+        {
+            _stressService = stressService;
+        }
+
         public ActionResult Index()
         {
-            return View();
+            List<StressResult> results = _stressService.GetAllStressResults("4002"); // Replace "userId" with the actual user identifier.
+            Console.WriteLine("test");
+            List<StressResultViewModel> viewmodels = results.Select(r => new StressResultViewModel()
+            {
+                Id = r.Id,
+                Result = r.StressLevel,
+                Date = r.date,
+                HoursSlept = r.HoursSlept
+            }).ToList();
+
+            return View(viewmodels);
         }
 
         // GET: StressController/Details/5
         public ActionResult Details(int id)
-        {
-            return View();
+        { 
+            DetailsStressViewModel model = new DetailsStressViewModel();
+            return View(model);
         }
 
         // GET: StressController/Create

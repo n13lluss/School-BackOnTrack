@@ -1,0 +1,41 @@
+﻿@model IEnumerable<BackOnTrack.GUI.Models.Stress.StressResultViewModel>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Result)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HoursSlept)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>    
+            <td>
+                Level @Html.DisplayFor(modelItem => item.Result) stress expierenced
+            </td>
+            <td>
+                @item.Date.ToString("dddd | dd/M/yyyy")
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HoursSlept)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

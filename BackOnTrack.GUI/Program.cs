@@ -10,6 +10,9 @@ builder.Services.AddScoped<ISleepRepository, SleepRepository>();
 builder.Services.AddScoped<IToDOService, ToDoService>();
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
 
+builder.Services.AddScoped<IStressService, StressService>();
+builder.Services.AddScoped<IStressRepository, StressRepository>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
