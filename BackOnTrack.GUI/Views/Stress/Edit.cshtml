@@ -1,6 +1,6 @@
 ﻿@model BackOnTrack.GUI.Models.Stress.EditStressViewModel
 
-<h4>EditStressViewModel</h4>
+<h4>Edit existing model for @Model.date.ToString("dddd | dd/M/yyyy")</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -11,11 +11,7 @@
                 <input type="range" id="slider" name="Result" asp-for="Result" min="0" max="6" step="1" value="@Model.Result" oninput="updateValue(this.value)" />
                 <div id="selectedValue">None</div>
                 <span asp-validation-for="Result" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="date" class="control-label"></label>
-                <input type="date" asp-for="date" class="form-control" />
-                <span asp-validation-for="date" class="text-danger"></span>
+                <input hidden="hidden" asp-for="date" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

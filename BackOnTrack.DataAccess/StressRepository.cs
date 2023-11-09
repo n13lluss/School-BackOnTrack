@@ -16,7 +16,7 @@ namespace BackOnTrack.DataAccess
         }
         public bool CreateResult(StressResult result)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
                 string query = "INSERT INTO Stress (StressLevel, Date, User_Id) " +
                     "VALUES (@StressLevel, @Date, @UserId)";
@@ -43,7 +43,7 @@ namespace BackOnTrack.DataAccess
 
         public bool DeleteResult(StressResult result)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
                 string query = "DELETE FROM Stress WHERE Id = @Id";
                 SqlCommand command = new(query, sqlConnection);
@@ -67,7 +67,7 @@ namespace BackOnTrack.DataAccess
 
         public bool EditResult(StressResult result)
         {
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
                 string query = "UPDATE Stress SET StressLevel = @StressLevel, Date = @Date, User_Id = @UserId WHERE Id = @Id";
                 SqlCommand command = new(query, sqlConnection);
@@ -96,12 +96,9 @@ namespace BackOnTrack.DataAccess
         {
             List<StressResult> stressResults = new();
 
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
-                string query = "SELECT s.Id, s.StressLevel, s.Date, s.User_Id, sl.HoursSlept as HoursSleptLastDay " +
-                    "           FROM Stress AS s " +
-                    "           INNER JOIN Sleepresults AS sl ON s.User_Id = sl.User_Id AND DATEADD(DAY, -1, s.Date) = sl.Date " +
-                    "           WHERE s.User_Id = @userId ORDER BY Date Desc";
+                string query = "SELECT s.Id, s.StressLevel, s.Date, s.User_Id, \r\n       ISNULL(sl.HoursSlept, 0) as HoursSleptLastDay\r\nFROM Stress AS s\r\nLEFT JOIN Sleepresults AS sl ON s.User_Id = sl.User_Id AND DATEADD(DAY, -1, s.Date) = sl.Date\r\nWHERE s.User_Id = @userId\r\nORDER BY Date Desc\r\n";
                 SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@userId", userId);
 
@@ -112,13 +109,14 @@ namespace BackOnTrack.DataAccess
                     {
                         while (reader.Read())
                         {
-                            StressResult result = new StressResult
+                            StressResult result = new()
                             {
                                 Id = Convert.ToInt32(reader["Id"]),
                                 StressLevel = Convert.ToInt32(reader["StressLevel"]),
                                 date = Convert.ToDateTime(reader["Date"]),
                                 HoursSlept = Convert.ToInt32(reader["HoursSleptLastDay"]),
-                                UserId = Convert.ToString(reader["User_Id"])
+                                UserId = 
+                                Convert.ToString(reader["User_Id"])
                             };
                             stressResults.Add(result);
                         }
@@ -136,9 +134,9 @@ namespace BackOnTrack.DataAccess
 
         public StressResult GetResultById(int id)
         {
-            StressResult stressResult = null;
+            StressResult stressResult = new();
 
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
                 string query = "SELECT s.Id, s.StressLevel, s.Date, s.User_Id, sl.HoursSlept as HoursSleptLastDay " +
                     "FROM Stress AS s " +
@@ -178,9 +176,9 @@ namespace BackOnTrack.DataAccess
 
         public StressResult GetStressByDate(string userId, DateTime date)
         {
-            StressResult stressResult = null;
+            StressResult stressResult = new();
 
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
                 string query = "SELECT s.Id, s.StressLevel, s.Date, s.User_Id, sl.HoursSlept as HoursSleptLastDay " +
                     "FROM Stress AS s " +
@@ -220,9 +218,9 @@ namespace BackOnTrack.DataAccess
 
         public StressResult GetStressByDateAndId(DateTime date, string userId)
         {
-            StressResult stressResult = null;
+            StressResult stressResult = new();
 
-            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            using (SqlConnection sqlConnection = new(_connectionString))
             {
                 string query = "SELECT s.Id, s.StressLevel, s.Date, s.User_Id, sl.HoursSlept as HoursSleptLastDay " +
                     "FROM Stress AS s " +

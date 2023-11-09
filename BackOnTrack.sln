@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackOnTrack.GUI", "BackOnTr
 		{059F837B-B89A-4915-81F0-F25FF11D611A} = {059F837B-B89A-4915-81F0-F25FF11D611A}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackOnTrack.Test", "BackOnTrack.Test\BackOnTrack.Test.csproj", "{8C646044-EB46-4BBB-8964-B48A9B420D89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{720981B8-C2F4-4C05-B9A1-B4EA1729643D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{720981B8-C2F4-4C05-B9A1-B4EA1729643D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{720981B8-C2F4-4C05-B9A1-B4EA1729643D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C646044-EB46-4BBB-8964-B48A9B420D89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C646044-EB46-4BBB-8964-B48A9B420D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C646044-EB46-4BBB-8964-B48A9B420D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C646044-EB46-4BBB-8964-B48A9B420D89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
