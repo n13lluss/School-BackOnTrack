@@ -8,34 +8,46 @@ namespace BackOnTrack.DataAccess
     public class StressRepository : IStressRepository
     {
         private readonly string? _connectionString;
-        private SqlConnection sqlConnection;
         public StressRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
-            sqlConnection = new SqlConnection(_connectionString);
+            _connectionString = configuration.GetConnectionString("SchoolConnection");
         }
         public bool CreateResult(StressResult result)
         {
-            using (SqlConnection sqlConnection = new(_connectionString))
+            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
             {
-                string query = "INSERT INTO Stress (StressLevel, Date, User_Id) " +
-                    "VALUES (@StressLevel, @Date, @UserId)";
-                SqlCommand command = new(query, sqlConnection);
-                command.Parameters.AddWithValue("@StressLevel", result.StressLevel);
-                command.Parameters.AddWithValue("@Date", result.date);
-                command.Parameters.AddWithValue("@UserId", result.UserId);
+                sqlConnection.Open();
+                SqlTransaction transaction = sqlConnection.BeginTransaction();
 
                 try
                 {
-                    sqlConnection.Open();
-                    int rowsAffected = command.ExecuteNonQuery();
-                    return rowsAffected > 0;
+                    string insertQuery = @"INSERT INTO Stress (StressLevel, Date, User_Id) 
+                                           VALUES (@StressLevel, @Date, @UserId);
+                                           SELECT SCOPE_IDENTITY();";
+
+                    SqlCommand command = new SqlCommand(insertQuery, sqlConnection, transaction);
+                    command.Parameters.AddWithValue("@StressLevel", result.StressLevel);
+                    command.Parameters.AddWithValue("@Date", result.date);
+                    command.Parameters.AddWithValue("@UserId", result.UserId);
+
+                    // Execute the query to insert into Stress and retrieve the generated ID
+                    int stressId = Convert.ToInt32(command.ExecuteScalar());
+
+                    // If successful, commit the transaction
+                    transaction.Commit();
+
+                    return true;
                 }
                 catch (Exception ex)
                 {
-                    // Handle or log the exception as needed.
+                    // Log the exception, and roll back the transaction on failure
                     Console.WriteLine(ex.Message);
-                    return false; // Return false to indicate failure.
+                    transaction.Rollback();
+                    return false;
+                }
+                finally
+                {
+                    sqlConnection.Close();
                 }
             }
         }
@@ -98,7 +110,15 @@ namespace BackOnTrack.DataAccess
 
             using (SqlConnection sqlConnection = new(_connectionString))
             {
-                string query = "SELECT s.Id, s.StressLevel, s.Date, s.User_Id, \r\n       ISNULL(sl.HoursSlept, 0) as HoursSleptLastDay\r\nFROM Stress AS s\r\nLEFT JOIN Sleepresults AS sl ON s.User_Id = sl.User_Id AND DATEADD(DAY, -1, s.Date) = sl.Date\r\nWHERE s.User_Id = @userId\r\nORDER BY Date Desc\r\n";
+                string query = """
+                SELECT s.Id, s.StressLevel, s.Date, s.User_Id, ISNULL(sl.HoursSlept, 0) as HoursSleptLastDay
+                FROM Stress AS s
+                LEFT JOIN Sleepresults AS sl 
+                  ON s.User_Id = sl.User_Id 
+                  AND DATEADD(DAY, -1, s.Date) = sl.Date
+                WHERE s.User_Id = @userId
+                ORDER BY Date Desc
+                """;
                 SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@userId", userId);
 
@@ -158,7 +178,7 @@ namespace BackOnTrack.DataAccess
                                 StressLevel = Convert.ToInt32(reader["StressLevel"]),
                                 date = Convert.ToDateTime(reader["Date"]),
                                 HoursSlept = Convert.ToInt32(reader["HoursSleptLastDay"]),
-                                UserId = Convert.ToString(reader["User_Id"])
+                                UserId = reader["User_Id"]?.ToString() ?? ""
                             };
                         }
                     }
