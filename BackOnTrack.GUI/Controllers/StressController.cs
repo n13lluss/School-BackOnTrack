@@ -11,6 +11,8 @@ namespace BackOnTrack.GUI.Controllers
 {
     public class StressController : Controller
     {
+        private const string TestUserId = "4002";
+
         private readonly IStressService _stressService;
         private readonly IToDOService _todoService;
         private readonly ILogger<StressController> _logger;
@@ -24,7 +26,7 @@ namespace BackOnTrack.GUI.Controllers
 
         public ActionResult Index()
         {
-            List<StressResult> results = _stressService.GetAllStressResults("4002");
+            List<StressResult> results = _stressService.GetAllStressResults(TestUserId); // 4002 is user id
             List<StressResultViewModel> viewmodels = results.Select(r => new StressResultViewModel()
             {
                 Id = r.Id,
@@ -39,7 +41,7 @@ namespace BackOnTrack.GUI.Controllers
         // GET: StressController/Details/5
         public ActionResult Details(int id)
         {
-            string userId = "4002";
+            string userId = TestUserId;
             StressResult model = _stressService.GetStressResultById(id);
             DetailsStressViewModel viewModel = new()
             {

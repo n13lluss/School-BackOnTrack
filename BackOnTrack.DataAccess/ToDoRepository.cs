@@ -11,67 +11,104 @@ namespace BackOnTrack.DataAccess
         private SqlConnection sqlConnection;
         public ToDoRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("SchoolConnection");
             sqlConnection = new SqlConnection(_connectionString);
         }
         public bool CreateToDo(ToDo toDo)
         {
-            using (sqlConnection = new SqlConnection(_connectionString)) // Create a new connection
+            using (sqlConnection = new SqlConnection(_connectionString))
             {
-                string query = "INSERT INTO [ToDo] ([Name], [Description], [Date], [User_Id], [Status]) VALUES (@name, @description, @date, @userId, @status)";
-
-                SqlCommand command = new(query, sqlConnection);
-                command.Parameters.AddWithValue("@name", toDo.Name);
-                command.Parameters.AddWithValue("@description", toDo.Description);
-                command.Parameters.AddWithValue("@date", toDo.PlannedDate);
-                command.Parameters.AddWithValue("@userId", toDo.UserId);
-                command.Parameters.AddWithValue("@status", toDo.Status);
+                sqlConnection.Open();
+                SqlTransaction transaction = sqlConnection.BeginTransaction();
 
                 try
                 {
-                    sqlConnection.Open();
+                    string insertToDoQuery = @"INSERT INTO [ToDo] ([Name], [Description], [Date], [Status]) 
+                                       VALUES (@name, @description, @date, @status);
+                                       SELECT SCOPE_IDENTITY();";
+
+                    SqlCommand command = new(insertToDoQuery, sqlConnection, transaction);
+                    command.Parameters.AddWithValue("@name", toDo.Name);
+                    command.Parameters.AddWithValue("@description", toDo.Description);
+                    command.Parameters.AddWithValue("@date", toDo.PlannedDate);
+                    command.Parameters.AddWithValue("@status", toDo.Status);
+
+                    // Execute the first query to insert into ToDo and retrieve the generated ID
+                    int todoId = Convert.ToInt32(command.ExecuteScalar());
+
+                    // Insert into UserToDo using the generated ToDo ID
+                    string insertUserToDoQuery = @"INSERT INTO UserActivity (UserId, ActivityId) 
+                                           VALUES (@userId, @todoId);";
+
+                    command = new(insertUserToDoQuery, sqlConnection, transaction);
+                    command.Parameters.AddWithValue("@userId", toDo.UserId);
+                    command.Parameters.AddWithValue("@todoId", todoId);
+
+                    // Execute the second query to insert into UserToDo
                     command.ExecuteNonQuery();
+
+                    // If both queries are successful, commit the transaction
+                    transaction.Commit();
+
                     return true; // Success
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception, don't re-throw it
+                    // Log the exception, and roll back the transaction on failure
                     Console.WriteLine(ex.Message);
+                    transaction.Rollback();
                     return false; // Return false to indicate an error
                 }
-            };
+                finally
+                {
+                    sqlConnection.Close();
+                }
+            }
         }
+
 
         public bool DeleteToDo(ToDo toDo)
         {
             using (sqlConnection = new SqlConnection(_connectionString))
             {
-                string query = "DELETE FROM [ToDo] WHERE [Id] = @SleepId AND [User_Id] = @UserId AND [Name] = @Name AND [Date] = @Date";
-
-                SqlCommand command = new(query, sqlConnection);
-                command.Parameters.AddWithValue("@SleepId", toDo.Id);
-                command.Parameters.AddWithValue("@UserId", toDo.UserId);
-                command.Parameters.AddWithValue("@Name", toDo.Name);
-                command.Parameters.AddWithValue("@Date", toDo.PlannedDate);
+                sqlConnection.Open();
+                SqlTransaction transaction = sqlConnection.BeginTransaction();
 
                 try
                 {
-                    sqlConnection.Open();
-                    int rowsAffected = command.ExecuteNonQuery();
+                    string deleteUserToDoQuery = @"DELETE FROM [UserActivity] WHERE [ActivityId] = @id";
+                    
 
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    SqlCommand command = new(deleteUserToDoQuery, sqlConnection, transaction);
+                    command.Parameters.AddWithValue("@id", toDo.Id);
+
+                    // Execute the first query to insert into ToDo and retrieve the generated ID
+                    int todoId = Convert.ToInt32(command.ExecuteScalar());
+
+                    // Insert into UserToDo using the generated ToDo ID
+                    string deleteToDoQuery = @"DELETE FROM [ToDo] WHERE [Id] = @id";
+
+                    command = new(deleteToDoQuery, sqlConnection, transaction);
+                    command.Parameters.AddWithValue("@id", toDo.Id);
+
+                    // Execute the second query to insert into UserToDo
+                    command.ExecuteNonQuery();
+
+                    // If both queries are successful, commit the transaction
+                    transaction.Commit();
+
+                    return true; // Success
                 }
                 catch (Exception ex)
                 {
+                    // Log the exception, and roll back the transaction on failure
                     Console.WriteLine(ex.Message);
-                    return false;
+                    transaction.Rollback();
+                    return false; // Return false to indicate an error
+                }
+                finally
+                {
+                    sqlConnection.Close();
                 }
             }
         }
@@ -81,7 +118,12 @@ namespace BackOnTrack.DataAccess
             List<ToDo> results = new();
             using (sqlConnection = new(_connectionString))
             {
-                string query = "SELECT [Id], [Name], [Description], [Date], [User_Id], [Status] FROM [ToDo] WHERE [User_id] = @userid ORDER BY [Date] desc";
+                string query = @"
+    SELECT TD.[Id], TD.Name, TD.Description, TD.Status, TD.Date
+    FROM ToDo as TD
+    JOIN UserActivity as UA ON TD.Id = UA.ActivityId
+    WHERE UA.UserId = @userid
+    ORDER BY TD.Date DESC";
                 SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@userid", userId);
 
@@ -98,7 +140,6 @@ namespace BackOnTrack.DataAccess
                                 Name = Convert.ToString(reader["Name"]),
                                 Description = Convert.ToString(reader["Description"]),
                                 PlannedDate = Convert.ToDateTime(reader["Date"]),
-                                UserId = Convert.ToString(reader["User_Id"]),
                                 Status = Convert.ToInt32(reader["Status"])
                             };
                             results.Add(result);
@@ -120,7 +161,12 @@ namespace BackOnTrack.DataAccess
 
             using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
             {
-                string query = "SELECT [Id], [Name], [Description], [Date], [User_Id], [Status] FROM [ToDo] WHERE [Date] = @date AND [User_Id] = @userId";
+                string query = @"SELECT TD.[Id], td.Name, td.Description, td.Status, td.Date 
+FROM ToDo as TD 
+JOIN UserActivity as UA 
+    ON TD.Id = UA.ActivityId 
+WHERE UA.UserId = @userid AND TD.[Date] = @date
+Order by td.Date Desc";
                 SqlCommand command = new SqlCommand(query, sqlConnection);
                 command.Parameters.AddWithValue("@date", date);
                 command.Parameters.AddWithValue("@userId", userId);
@@ -138,7 +184,6 @@ namespace BackOnTrack.DataAccess
                                 Name = Convert.ToString(reader["Name"]),
                                 Description = Convert.ToString(reader["Description"]),
                                 PlannedDate = Convert.ToDateTime(reader["Date"]),
-                                UserId = Convert.ToString(reader["User_Id"]),
                                 Status = Convert.ToInt32(reader["Status"])
                             };
                             todoList.Add(todo);
@@ -161,7 +206,12 @@ namespace BackOnTrack.DataAccess
             ToDo result = new();
             using (sqlConnection = new(_connectionString))
             {
-                string query = "SELECT [Id], [Name], [Description], [Date], [User_Id], [Status] FROM [ToDo] WHERE [Id] = @id";
+                string query = @"SELECT TD.[Id], td.Name, td.Description, td.Status, td.Date 
+FROM ToDo as TD 
+JOIN UserActivity as UA 
+    ON TD.Id = UA.ActivityId 
+WHERE TD.[Id] = @id
+Order by td.Date Desc";
                 SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@id", id);
 
@@ -178,7 +228,6 @@ namespace BackOnTrack.DataAccess
                                 Name = Convert.ToString(reader["Name"]),
                                 Description = Convert.ToString(reader["Description"]),
                                 PlannedDate = Convert.ToDateTime(reader["Date"]),
-                                UserId = Convert.ToString(reader["User_Id"]),
                                 Status = Convert.ToInt32(reader["Status"])
                             };
                         }
@@ -198,7 +247,12 @@ namespace BackOnTrack.DataAccess
             List<ToDo> results = new();
             using (sqlConnection = new(_connectionString))
             {
-                string query = "SELECT [Id], [Name], [Description], [Date], [User_Id], [Status] FROM [ToDo] WHERE [Name] = @name AND [User_id] = @userid ORDER BY [Date] desc";
+                string query = @"SELECT TD.[Id], td.Name, td.Description, td.Status, td.Date 
+FROM[BackOnTrack].[dbo].ToDo as TD 
+JOIN[BackOnTrack].[dbo].UserActivity as UA 
+    ON TD.Id = UA.ActivityId 
+WHERE UA.UserId = @userid AND TD.[Name] = @name
+Order by td.Date Desc";
                 SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@name", name);
                 command.Parameters.AddWithValue("@userid", userId);
@@ -216,7 +270,6 @@ namespace BackOnTrack.DataAccess
                                 Name = Convert.ToString(reader["Name"]),
                                 Description = Convert.ToString(reader["Description"]),
                                 PlannedDate = Convert.ToDateTime(reader["Date"]),
-                                UserId = Convert.ToString(reader["User_Id"]),
                                 Status = Convert.ToInt32(reader["Status"])
                             };
                             results.Add(result);
@@ -237,10 +290,16 @@ namespace BackOnTrack.DataAccess
             ToDo result = new();
             using (sqlConnection = new(_connectionString))
             {
-                string query = "SELECT [Id], [Name], [Description], [Date], [User_Id], [Status] FROM [ToDo] WHERE [Name] = @name AND [User_id] = @userid AND [Date] = @date";
+                string query = @"SELECT TD.[Id], TD.Name, TD.Description, TD.Status, TD.Date 
+FROM ToDo as TD 
+JOIN UserActivity as UA 
+    ON TD.Id = UA.ActivityId 
+WHERE UA.UserId = @userid AND TD.[Name] = @name AND TD.[Date] = @date
+Order by td.Date Desc";
                 SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@name", name);
                 command.Parameters.AddWithValue("@userid", userId);
+                command.Parameters.AddWithValue("@date", ondate);
 
                 try
                 {
@@ -255,7 +314,6 @@ namespace BackOnTrack.DataAccess
                                 Name = Convert.ToString(reader["Name"]),
                                 Description = Convert.ToString(reader["Description"]),
                                 PlannedDate = Convert.ToDateTime(reader["Date"]),
-                                UserId = Convert.ToString(reader["User_Id"]),
                                 Status = Convert.ToInt32(reader["Status"])
                             };
                         }

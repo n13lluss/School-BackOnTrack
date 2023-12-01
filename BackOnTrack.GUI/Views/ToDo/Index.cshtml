@@ -3,7 +3,7 @@
 <p>
     <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
-<table class="table">
+<table class="table table-hover">
     <thead>
         <tr>
             <th>
@@ -37,7 +37,7 @@
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
-                    @item.Planned.ToString("dddd dd/M/yyyy")
+                    @item.Planned.ToString("dddd | dd/M/yyyy")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Status)

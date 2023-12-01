@@ -11,7 +11,7 @@ namespace BackOnTrack.DataAccess
         private SqlConnection sqlConnection;
         public SleepRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("SchoolConnection");
             sqlConnection = new SqlConnection(_connectionString);
         }
         public bool CreateResult(SleepResult result)
@@ -79,9 +79,9 @@ namespace BackOnTrack.DataAccess
 
         public List<SleepResult> GetAll()
         {
-            List<SleepResult > sleepResults = new(); 
+            List<SleepResult> sleepResults = new();
 
-            using(sqlConnection = new SqlConnection(_connectionString))
+            using (sqlConnection = new SqlConnection(_connectionString))
             {
                 string query = "SELECT [Id], [HoursSlept], [User_Id], [Date] FROM [SleepResults] ORDER BY [Date] desc";
                 SqlCommand command = new(query, sqlConnection);
@@ -89,7 +89,7 @@ namespace BackOnTrack.DataAccess
                 try
                 {
                     sqlConnection.Open();
-                    using(SqlDataReader reader = command.ExecuteReader())
+                    using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
