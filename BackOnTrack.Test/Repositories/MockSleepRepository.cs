@@ -11,25 +11,40 @@ namespace BackOnTrack.Test.Repositories
 {
     public class MockSleepRepository : ISleepRepository
     {
-        List<Sleep> _sleeps = new List<Sleep>();
+        public List<SleepResult> _sleeps = new List<SleepResult>();
         public bool CreateResult(SleepResult result)
         {
-            throw new NotImplementedException();
+            result.Id = _sleeps.Count + 1;
+            _sleeps.Add(result);
+            return true;
         }
 
         public bool DeleteResult(SleepResult result)
         {
-            throw new NotImplementedException();
+            foreach(var sleep in _sleeps)
+            {
+                if (sleep.Id == result.Id)
+                {
+                    _sleeps.Remove(sleep);
+                    return true;
+                }
+            }
+            return false;
+
         }
 
         public List<SleepResult> GetAll()
         {
-            throw new NotImplementedException();
+            return _sleeps;
         }
 
         public SleepResult GetById(int id)
         {
-            throw new NotImplementedException();
+            foreach (SleepResult result in _sleeps)
+            {
+                if(result.Id == id) return result;
+            }
+            return new SleepResult();
         }
 
         public List<SleepResult> GetLastSeven()

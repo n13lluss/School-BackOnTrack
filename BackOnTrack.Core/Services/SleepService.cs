@@ -129,7 +129,19 @@ namespace BackOnTrack.Core.Services
 
         private static bool IsSleepResultValid(SleepResult result)
         {
-            return result.HoursSlept >= 0 && result.HoursSlept <= 24 && result.Date >= new DateTime(2000, 1, 1) && result.Date <= DateTime.Today;
+            if(result.HoursSlept >= 0 && result.HoursSlept <= 24 && result.Date >= new DateTime(2000, 1, 1) && result.Date <= DateTime.Today)
+            {
+                return true;
+            }
+            if(result.Date > new DateTime(2000, 1, 1) && result.Date < DateTime.Today)
+            {
+                throw new Exception("The date is not in the current range");
+            }
+            if (result.HoursSlept < 0 && result.HoursSlept > 24)
+            {
+                throw new Exception("The hours slept is not in the current range");
+            }
+            return false;
         }
     }
 }
