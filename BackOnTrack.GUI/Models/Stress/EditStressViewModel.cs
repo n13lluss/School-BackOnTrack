@@ -1,5 +1,4 @@
-﻿using Humanizer.Localisation.TimeToClockNotation;
-
+﻿
 namespace BackOnTrack.GUI.Models.Stress
 {
     public class EditStressViewModel

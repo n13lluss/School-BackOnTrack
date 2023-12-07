@@ -110,15 +110,7 @@ namespace BackOnTrack.DataAccess
 
             using (SqlConnection sqlConnection = new(_connectionString))
             {
-                string query = """
-                SELECT s.Id, s.StressLevel, s.Date, s.User_Id, ISNULL(sl.HoursSlept, 0) as HoursSleptLastDay
-                FROM Stress AS s
-                LEFT JOIN Sleepresults AS sl 
-                  ON s.User_Id = sl.User_Id 
-                  AND DATEADD(DAY, -1, s.Date) = sl.Date
-                WHERE s.User_Id = @userId
-                ORDER BY Date Desc
-                """;
+                string query = "SELECT s.Id, s.StressLevel, s.Date, s.User_Id, ISNULL(sl.HoursSlept, 0) as HoursSleptLastDay FROM Stress AS s LEFT JOIN Sleepresults AS sl ON s.User_Id = sl.User_Id AND DATEADD(DAY, -1, s.Date) = sl.Date WHERE s.User_Id = @userId ORDER BY Date Desc";
                 SqlCommand command = new(query, sqlConnection);
                 command.Parameters.AddWithValue("@userId", userId);
 

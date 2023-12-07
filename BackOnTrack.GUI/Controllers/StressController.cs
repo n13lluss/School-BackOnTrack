@@ -5,7 +5,6 @@ using BackOnTrack.GUI.Models.SleepResult;
 using BackOnTrack.GUI.Models.Stress;
 using BackOnTrack.GUI.Models.ToDo;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Differencing;
 
 namespace BackOnTrack.GUI.Controllers
 {

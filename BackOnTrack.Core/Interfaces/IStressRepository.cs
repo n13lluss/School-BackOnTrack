@@ -1,5 +1,4 @@
 ﻿using BackOnTrack.Core.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BackOnTrack.Core.Interfaces
 {
